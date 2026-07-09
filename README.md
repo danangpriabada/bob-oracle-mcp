@@ -5,23 +5,26 @@
 ![MCP](https://img.shields.io/badge/MCP-Compatible-blue)
 ![License](https://img.shields.io/github/license/danangpriabada/bob-oracle-mcp)
 
-Production-ready Oracle Model Context Protocol (MCP) Server for Oracle Database.
+Production-ready Oracle Model Context Protocol (MCP) Server built with Node.js.
 
-Oracle MCP provides AI assistants with secure, structured access to Oracle databases through the Model Context Protocol. It is designed with a modular architecture, read-only safety by default, metadata discovery, and extensible tool registration.
+Oracle MCP provides AI assistants with secure, structured access to Oracle Database through the Model Context Protocol (MCP). The project follows a layered architecture with adapters, repositories, services, registries, and MCP tools, making it easy to extend while keeping database access safe and maintainable.
+
+---
 
 ## Features
 
 * Oracle Database connectivity
 * Connection pooling
-* Read-only mode by default
+* Read-only mode support
 * SQL validation
-* Metadata discovery
+* Metadata exploration
+* Object discovery
+* DDL extraction
 * Stored procedure execution
 * Function execution
-* Transaction support
-* Modular service architecture
-* MCP-compliant tool registry
-* Logging and audit middleware
+* Transaction management
+* Modular MCP tool registry
+* Logging & audit middleware
 * Environment-based configuration
 
 ---
@@ -30,14 +33,7 @@ Oracle MCP provides AI assistants with secure, structured access to Oracle datab
 
 ```text
 .
-├── docs/
-├── logs/
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   ├── fixtures/
-│   └── mocks/
-├── src/
+├── src
 │   ├── adapters/
 │   ├── bootstrap/
 │   ├── config/
@@ -52,11 +48,20 @@ Oracle MCP provides AI assistants with secure, structured access to Oracle datab
 │   ├── schemas/
 │   ├── security/
 │   ├── services/
+│   │   ├── customer/
+│   │   └── metadata/
 │   ├── tools/
+│   │   ├── customer/
+│   │   └── database/
 │   ├── utils/
-│   └── validators/
-├── .env.example
+│   ├── validators/
+│   ├── app.js
+│   └── server.js
+├── docs/
+├── tests/
+├── logs/
 ├── package.json
+├── .env.example
 └── README.md
 ```
 
@@ -65,35 +70,26 @@ Oracle MCP provides AI assistants with secure, structured access to Oracle datab
 ## Requirements
 
 * Node.js 20+
-* Oracle Database 19c or newer
-* Oracle Instant Client (if required by your platform)
+* Oracle Database 19c or later
+* Oracle Instant Client (when required)
 
 ---
 
 ## Installation
 
-Clone the repository.
-
 ```bash
 git clone https://github.com/danangpriabada/bob-oracle-mcp.git
+
 cd bob-oracle-mcp
-```
 
-Install dependencies.
-
-```bash
 npm install
-```
 
-Create your environment configuration.
-
-```bash
 cp .env.example .env
 ```
 
 ---
 
-## Environment Variables
+## Environment
 
 ```env
 NODE_ENV=development
@@ -117,13 +113,11 @@ READ_ONLY=true
 
 ## Running
 
-Start the server.
-
 ```bash
 node src/server.js
 ```
 
-Or with npm.
+or
 
 ```bash
 npm start
@@ -133,19 +127,19 @@ npm start
 
 ## MCP Inspector
 
-Install the inspector.
+Install the inspector:
 
 ```bash
 npm install -g @modelcontextprotocol/inspector
 ```
 
-Launch the server.
+Run the server with the inspector:
 
 ```bash
 npx @modelcontextprotocol/inspector node src/server.js
 ```
 
-If you need to remove it:
+Remove the global installation if no longer needed:
 
 ```bash
 npm uninstall -g @modelcontextprotocol/inspector
@@ -153,30 +147,35 @@ npm uninstall -g @modelcontextprotocol/inspector
 
 ---
 
-## Planned MCP Tools
+## Available Database Tools
 
-### Database
+| Tool              | Description                  |
+| ----------------- | ---------------------------- |
+| ping              | Test Oracle connectivity     |
+| health            | Database health check        |
+| current-user      | Get current Oracle user      |
+| current-schema    | Get active schema            |
+| database-version  | Retrieve Oracle version      |
+| execute-sql       | Execute SQL statement        |
+| explain-plan      | Generate execution plan      |
+| describe-table    | Describe table structure     |
+| get-ddl           | Retrieve object DDL          |
+| list-tables       | List tables                  |
+| list-views        | List views                   |
+| list-columns      | List table columns           |
+| search-columns    | Search columns across schema |
+| list-indexes      | List indexes                 |
+| list-constraints  | List constraints             |
+| list-sequences    | List sequences               |
+| list-packages     | List PL/SQL packages         |
+| list-procedures   | List procedures              |
+| search-object     | Search Oracle objects        |
+| execute-function  | Execute Oracle function      |
+| execute-procedure | Execute Oracle procedure     |
 
-* ping
-* health
-* current-user
-* current-schema
-* database-version
-* execute-sql
-* explain-plan
-* describe-table
-* list-tables
-* list-views
-* list-columns
-* list-indexes
-* list-constraints
-* list-sequences
-* list-packages
-* list-procedures
-* execute-function
-* execute-procedure
+---
 
-### Customer
+## Available Customer Tools
 
 * create
 * update
@@ -186,16 +185,57 @@ npm uninstall -g @modelcontextprotocol/inspector
 
 ---
 
+## Architecture
+
+```text
+MCP Client
+      │
+      ▼
+ Registry
+      │
+      ▼
+    Tools
+      │
+      ▼
+  Services
+      │
+      ▼
+Repositories
+      │
+      ▼
+ Oracle Adapter
+      │
+      ▼
+ Oracle Database
+```
+
+---
+
 ## Security
 
-Oracle MCP is designed with production safety in mind.
+The project is designed with production deployments in mind.
 
-* Read-only mode enabled by default
+* Read-only mode support
 * SQL validation
-* Permission checks
-* Audit logging
-* Configurable tool registration
+* Permission layer
+* Audit middleware
 * Centralized error handling
+* Modular registry for controlled tool exposure
+
+---
+
+## Roadmap
+
+* Authentication & Authorization
+* Role-based tool permissions
+* OCI integration
+* Oracle Thin Driver optimization
+* Docker support
+* Kubernetes deployment
+* GitHub Actions CI/CD
+* OpenTelemetry
+* Unit tests
+* Integration tests
 
 ---
 
@@ -207,5 +247,6 @@ MIT
 
 ## Author
 
-Danang Priabada
+**Danang Priabada**
+
 GitHub: https://github.com/danangpriabada
