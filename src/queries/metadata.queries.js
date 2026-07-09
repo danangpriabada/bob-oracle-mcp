@@ -1,0 +1,136 @@
+// src/queries/metadata.queries.js
+
+export const METADATA_QUERIES = {
+
+  GET_DDL: `
+  SELECT DBMS_METADATA.GET_DDL(
+      :objectType,
+      :objectName,
+      :owner
+  ) AS DDL
+  FROM DUAL
+  `,
+
+  SEARCH_OBJECTS: `
+  SELECT
+      OWNER,
+      OBJECT_NAME,
+      OBJECT_TYPE,
+      STATUS,
+      CREATED,
+      LAST_DDL_TIME
+  FROM ALL_OBJECTS
+  WHERE UPPER(OBJECT_NAME) LIKE '%' || UPPER(:keyword) || '%'
+  AND OBJECT_TYPE IN (
+      'TABLE',
+      'VIEW',
+      'PACKAGE',
+      'PROCEDURE',
+      'FUNCTION',
+      'SEQUENCE',
+      'SYNONYM',
+      'TYPE'
+  )
+  ORDER BY
+      OBJECT_TYPE,
+      OBJECT_NAME
+  `,
+
+  SEARCH_COLUMNS: `
+  SELECT
+      OWNER,
+      TABLE_NAME,
+      COLUMN_NAME,
+      DATA_TYPE,
+      DATA_LENGTH,
+      NULLABLE
+  FROM ALL_TAB_COLUMNS
+  WHERE UPPER(COLUMN_NAME) LIKE '%' || UPPER(:keyword) || '%'
+  ORDER BY
+      OWNER,
+      TABLE_NAME,
+      COLUMN_ID
+  `,
+
+  LIST_TABLES: `
+    SELECT
+      OWNER,
+      TABLE_NAME
+    FROM ALL_TABLES
+    WHERE OWNER = :owner
+    ORDER BY TABLE_NAME
+  `,
+
+  LIST_COLUMNS: `
+    SELECT
+      COLUMN_ID,
+      COLUMN_NAME,
+      DATA_TYPE,
+      DATA_LENGTH,
+      DATA_PRECISION,
+      DATA_SCALE,
+      NULLABLE
+    FROM ALL_TAB_COLUMNS
+    WHERE OWNER = :owner
+      AND TABLE_NAME = :tableName
+    ORDER BY COLUMN_ID
+  `,
+
+  LIST_CONSTRAINTS: `
+    SELECT
+      CONSTRAINT_NAME,
+      CONSTRAINT_TYPE,
+      STATUS
+    FROM ALL_CONSTRAINTS
+    WHERE OWNER = :owner
+      AND TABLE_NAME = :tableName
+    ORDER BY CONSTRAINT_NAME
+  `,
+
+  LIST_INDEXES: `
+    SELECT
+      INDEX_NAME,
+      UNIQUENESS,
+      STATUS
+    FROM ALL_INDEXES
+    WHERE TABLE_OWNER = :owner
+      AND TABLE_NAME = :tableName
+    ORDER BY INDEX_NAME
+  `,
+
+  LIST_VIEWS: `
+    SELECT
+      OWNER,
+      VIEW_NAME
+    FROM ALL_VIEWS
+    WHERE OWNER = :owner
+    ORDER BY VIEW_NAME
+  `,
+
+  LIST_SEQUENCES: `
+    SELECT
+      SEQUENCE_NAME
+    FROM ALL_SEQUENCES
+    WHERE SEQUENCE_OWNER = :owner
+    ORDER BY SEQUENCE_NAME
+  `,
+
+  CURRENT_SCHEMA: `
+    SELECT SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') AS CURRENT_SCHEMA
+    FROM DUAL
+  `,
+
+  CURRENT_USER: `
+    SELECT USER AS USERNAME
+    FROM DUAL
+  `,
+
+  DATABASE_VERSION: `
+    SELECT
+      BANNER_FULL
+    FROM V$VERSION
+  `
+
+};
+
+export default METADATA_QUERIES;
